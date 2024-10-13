@@ -1,40 +1,32 @@
-from PIL import Image
-import numpy as np
 
-def encrypt_image(image_path, output_path, key):
-    # Open the image
-    img = Image.open(image_path)
-    img = img.convert("RGB")  # Ensure image is in RGB format
-    img_array = np.array(img)
+from tkinter import *
+from tkinter import filedialog
 
-    # Encrypt the image by adding the key to each pixel
-    encrypted_array = (img_array + key) % 256
-    encrypted_image = Image.fromarray(encrypted_array.astype('uint8'), 'RGB')
+root=Tk()
+root.geometry("200x168")
 
-    # Save the encrypted image
-    encrypted_image.save(output_path)
-    print(f"Encrypted image saved to {output_path}")
+def encrypt_image():
+    file1=filedialog.askopenfile(mode='r',filetypes=[('jpg file','*.jpg')])
+    if file1 is not None:
+        # print(file1)
+        file_name=file1.name
+        #print(file_name)
+        key=entry1.get(1.0,END)
+        print(file_name,key)
+        fi=open(file_name,'rb')
+        image=fi.read()
+        fi.close()
+        image=bytearray(image)
+        for index,values in enumerate(image):
+            image[index]=values^int(key)
+        fi1=open(file_name,'wb')
+        fi1.write(image)
+        fi1.close()
 
-def decrypt_image(encrypted_path, output_path, key):
-    # Open the encrypted image
-    img = Image.open(encrypted_path)
-    img = img.convert("RGB")
-    img_array = np.array(img)
+b1=Button(root,text="encrypt",command=encrypt_image)
+b1.place(x=70,y=10)
 
-    # Decrypt the image by subtracting the key from each pixel
-    decrypted_array = (img_array - key) % 256
-    decrypted_image = Image.fromarray(decrypted_array.astype('uint8'), 'RGB')
+entry1=Text(root,height=1,width=10)
+entry1.place(x=50,y=50)
 
-    # Save the decrypted image
-    decrypted_image.save(output_path)
-    print(f"Decrypted image saved to {output_path}")
-
-# Example usage
-if __name__ == "__main__":
-    original_image_path = "rocket-raccon.jpg"
-    encrypted_image_path = "encrypted_rocket.jpg"
-    decrypted_image_path = "decrypted_rocket.jpg"
-    encryption_key = 50  # Example key for encryption and decryption
-
-    encrypt_image(original_image_path, encrypted_image_path, encryption_key)
-    decrypt_image(encrypted_image_path, decrypted_image_path, encryption_key)
+root.mainloop()
